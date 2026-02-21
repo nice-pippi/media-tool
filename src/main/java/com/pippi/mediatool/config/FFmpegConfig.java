@@ -1,0 +1,29 @@
+package com.pippi.mediatool.config;
+
+import com.pippi.mediatool.properties.FFmpegProperties;
+import net.bramp.ffmpeg.FFmpeg;
+import net.bramp.ffmpeg.FFprobe;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+
+/**
+ * @Author: hong
+ * @CreateTime: 2026-02-21
+ * @Description: ffmpeg配置类
+ * @Version: 1.0
+ */
+@Configuration
+public class FFmpegConfig {
+
+    @Bean
+    public FFmpeg ffmpeg(FFmpegProperties fFmpegProperties) throws IOException {
+        return new FFmpeg(fFmpegProperties.getPath() + "/ffmpeg");
+    }
+
+    @Bean
+    public FFprobe ffprobe(FFmpegProperties fFmpegProperties) throws IOException {
+        return new FFprobe(fFmpegProperties.getPath() + "/ffprobe");
+    }
+}
