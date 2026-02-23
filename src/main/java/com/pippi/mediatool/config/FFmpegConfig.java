@@ -17,11 +17,25 @@ import java.io.IOException;
 @Configuration
 public class FFmpegConfig {
 
+    /**
+     * 创建ffmpeg实例
+     *
+     * @param fFmpegProperties ffmpeg属性
+     * @return FFmpeg实例
+     * @throws IOException 创建实例异常
+     */
     @Bean
     public FFmpeg ffmpeg(FFmpegProperties fFmpegProperties) throws IOException {
         return new FFmpeg(fFmpegProperties.getPath() + "/ffmpeg");
     }
 
+    /**
+     * 创建ffprobe实例
+     *
+     * @param fFmpegProperties ffmpeg属性
+     * @return FFprobe实例
+     * @throws IOException 创建实例异常
+     */
     @Bean
     public FFprobe ffprobe(FFmpegProperties fFmpegProperties) throws IOException {
         return new FFprobe(fFmpegProperties.getPath() + "/ffprobe");
