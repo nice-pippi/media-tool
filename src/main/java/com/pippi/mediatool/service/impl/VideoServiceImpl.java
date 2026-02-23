@@ -15,6 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,19 +38,25 @@ public class VideoServiceImpl implements VideoService {
     private FFprobe ffprobe;
 
     @Override
-    public void download(String url, String path) {
+    public String download(String url, String outputPath) {
+        String fileName = null;
         try {
+            // 确保输出目录存在
+            Files.createDirectories(Paths.get(outputPath));
+
             // 获取视频源信息
             FFmpegProbeResult in = ffprobe.probe(url);
+
+            // 随机文件名
+            fileName = outputPath + UUID.randomUUID() + ".mp4";
 
             // 构建FFmpeg命令参数
             FFmpegBuilder builder = new FFmpegBuilder()
                     .setInput(url)
-                    .addOutput(path)
+                    .addOutput(fileName)
                     .setAudioCodec("copy")
                     .setVideoCodec("copy")
                     .done();
-
 
             // 创建FFmpeg执行器
             FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
@@ -60,12 +70,15 @@ public class VideoServiceImpl implements VideoService {
                 public void progress(Progress progress) {
                     // 计算下载进度百分比
                     int percentage = (int) Math.round(progress.out_time_ns / duration_ns * 100);
+
                     log.info("下载进度: {}%", percentage);
                 }
             });
 
-            // 执行下载任务
-            job.run();
+            // 异步执行下载任务
+            CompletableFuture.runAsync(job);
+
+            return fileName;
         } catch (IOException e) {
             log.error("下载视频异常：{}", e.getMessage());
             throw new BusinessException("下载视频异常");
