@@ -4,9 +4,14 @@ import com.pippi.mediatool.service.VideoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 @SpringBootTest
 class MediaToolApplicationTests {
+
+    @MockitoBean
+    private ServerEndpointExporter serverEndpointExporter;  // 添加这一行，避免启动失败
 
     @Autowired
     private VideoService videoService;
