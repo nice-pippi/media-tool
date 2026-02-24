@@ -1,4 +1,4 @@
-package com.pippi.mediatool.pojo;
+package com.pippi.mediatool.common;
 
 import com.pippi.mediatool.enums.FileTypeEnum;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * @Author: hong
  * @CreateTime: 2026-02-24
- * @Description:
+ * @Description: 下载任务-实体类
  * @Version: 1.0
  */
 @Data

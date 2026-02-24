@@ -3,7 +3,8 @@ package com.pippi.mediatool.service.impl;
 import com.pippi.mediatool.constant.FilePathConstant;
 import com.pippi.mediatool.enums.FileTypeEnum;
 import com.pippi.mediatool.exception.BusinessException;
-import com.pippi.mediatool.pojo.DownloadTask;
+import com.pippi.mediatool.common.DownloadTask;
+import com.pippi.mediatool.mvc.vo.TaskVO;
 import com.pippi.mediatool.service.VideoService;
 import com.pippi.mediatool.utils.FileUtil;
 import com.pippi.mediatool.websocket.WebSocketServer;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -51,7 +51,7 @@ public class VideoServiceImpl implements VideoService {
     private static final ConcurrentHashMap<String, DownloadTask> TASK_MAP = new ConcurrentHashMap<>();
 
     @Override
-    public String download(String url) {
+    public TaskVO download(String url) {
         // 文件名
         FileUtil.makeDir(FilePathConstant.VIDEO_TEMP_PATH);
         String fileName = FilePathConstant.VIDEO_TEMP_PATH + UUID.randomUUID() + ".mp4";
@@ -103,7 +103,7 @@ public class VideoServiceImpl implements VideoService {
                 }
             });
 
-            return taskId;
+            return new TaskVO(taskId);
         } catch (IOException e) {
             // 删除文件
             FileUtil.deleteFile(fileName);

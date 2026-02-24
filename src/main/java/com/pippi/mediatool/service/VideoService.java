@@ -1,5 +1,7 @@
 package com.pippi.mediatool.service;
 
+import com.pippi.mediatool.mvc.vo.TaskVO;
+
 /**
  * @Author: hong
  * @CreateTime: 2026-02-21
@@ -14,6 +16,6 @@ public interface VideoService {
      * @param url 视频地址
      * @return 任务ID
      */
-    String download(String url);
+    TaskVO download(String url);
 
 }
