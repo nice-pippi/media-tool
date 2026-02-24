@@ -5,15 +5,11 @@ import java.io.File;
 /**
  * @Author: hong
  * @CreateTime: 2026-02-24
- * @Description:
+ * @Description: 临时文件路径常量
  * @Version: 1.0
  */
-public class FilePathConstant {
+public interface FilePathConstant {
 
-    private static final String USER_DIR = System.getProperty("user.dir");
-    private static final String SEPARATOR = File.separator;
-    private static final String TEMP_DIR = "temp";
-
-    public static final String VIDEO_TEMP_PATH = USER_DIR + SEPARATOR + TEMP_DIR + SEPARATOR + "video" + SEPARATOR;
-
+    String VIDEO_TEMP_PATH = System.getProperty("user.dir") + File.separator +
+            "temp" + File.separator + "video" + File.separator;
 }
