@@ -84,10 +84,8 @@ public class WebSocketServer {
         if (session != null && session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(String.valueOf(percentage));
-                log.debug("进度推送成功，任务ID: {}，进度: {}%", taskId, percentage);
             } catch (IOException e) {
                 log.error("发送进度失败，任务ID: {}", taskId, e);
-                // 发送失败时移除失效的会话
                 sessionMap.remove(taskId);
             }
         } else {

@@ -1,6 +1,6 @@
 package com.pippi.mediatool.service;
 
-import com.pippi.mediatool.mvc.vo.TaskVO;
+import com.pippi.mediatool.mvc.co.TaskCO;
 
 /**
  * @Author: hong
@@ -13,9 +13,8 @@ public interface VideoService {
     /**
      * 下载视频
      *
-     * @param url 视频地址
-     * @return 任务ID
+     * @param co 任务参数
      */
-    TaskVO download(String url);
+    void download(TaskCO co);
 
 }

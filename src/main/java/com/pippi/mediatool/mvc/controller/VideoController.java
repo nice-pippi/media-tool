@@ -1,13 +1,11 @@
 package com.pippi.mediatool.mvc.controller;
 
 import com.pippi.mediatool.common.R;
+import com.pippi.mediatool.mvc.co.TaskCO;
 import com.pippi.mediatool.mvc.vo.TaskVO;
 import com.pippi.mediatool.service.impl.VideoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author: hong
@@ -21,9 +19,10 @@ public class VideoController {
     @Autowired
     private VideoServiceImpl videoService;
 
-    @GetMapping("/download")
-    public R<TaskVO> download(@RequestParam("url") String url) {
-        return R.success(videoService.download(url));
+    @PostMapping("/download")
+    public R<Void> download(@RequestBody TaskCO co) {
+        videoService.download(co);
+        return R.success();
     }
 
 }

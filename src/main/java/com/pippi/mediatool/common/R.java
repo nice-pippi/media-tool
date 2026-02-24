@@ -21,16 +21,24 @@ public class R<T> implements Serializable {
 
     public static <T> R<T> success(T object) {
         R<T> r = new R<T>();
-        r.data = object;
         r.code = 200;
+        r.data = object;
+        r.msg = "操作成功";
+        return r;
+    }
+
+    public static <T> R<T> success() {
+        R<T> r = new R<>();
+        r.code = 200;
+        r.data = null;
         r.msg = "操作成功";
         return r;
     }
 
     public static <T> R<T> error(String msg) {
         R<T> r = new R<>();
-        r.msg = msg;
         r.code = 500;
+        r.msg = msg;
         return r;
     }
 }

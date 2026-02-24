@@ -4,6 +4,7 @@ import com.pippi.mediatool.constant.FilePathConstant;
 import com.pippi.mediatool.enums.FileTypeEnum;
 import com.pippi.mediatool.exception.BusinessException;
 import com.pippi.mediatool.common.DownloadTask;
+import com.pippi.mediatool.mvc.co.TaskCO;
 import com.pippi.mediatool.mvc.vo.TaskVO;
 import com.pippi.mediatool.service.VideoService;
 import com.pippi.mediatool.utils.FileUtil;
@@ -51,13 +52,16 @@ public class VideoServiceImpl implements VideoService {
     private static final ConcurrentHashMap<String, DownloadTask> TASK_MAP = new ConcurrentHashMap<>();
 
     @Override
-    public TaskVO download(String url) {
-        // 文件名
+    public void download(TaskCO co) {
+        // 视频地址
+        String url = co.getUrl();
+
+        // 输出文件路径
         FileUtil.makeDir(FilePathConstant.VIDEO_TEMP_PATH);
         String fileName = FilePathConstant.VIDEO_TEMP_PATH + UUID.randomUUID() + ".mp4";
 
         // 创建任务对象
-        String taskId = UUID.randomUUID().toString();
+        String taskId = co.getTaskId();
         DownloadTask task = DownloadTask.of(taskId, FileTypeEnum.VIDEO, fileName);
         TASK_MAP.put(taskId, task);
 
@@ -102,8 +106,6 @@ public class VideoServiceImpl implements VideoService {
                     log.error("下载视频异常：{}", e.getMessage());
                 }
             });
-
-            return new TaskVO(taskId);
         } catch (IOException e) {
             // 删除文件
             FileUtil.deleteFile(fileName);
