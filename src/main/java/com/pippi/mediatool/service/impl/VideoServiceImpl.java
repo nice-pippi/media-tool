@@ -1,7 +1,11 @@
 package com.pippi.mediatool.service.impl;
 
+import com.pippi.mediatool.enums.FileTypeEnum;
 import com.pippi.mediatool.exception.BusinessException;
+import com.pippi.mediatool.pojo.DownloadTask;
 import com.pippi.mediatool.service.VideoService;
+import com.pippi.mediatool.utils.FileUtil;
+import com.pippi.mediatool.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
@@ -12,13 +16,17 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.progress.Progress;
 import net.bramp.ffmpeg.progress.ProgressListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,18 +45,22 @@ public class VideoServiceImpl implements VideoService {
     @Autowired
     private FFprobe ffprobe;
 
-    @Override
-    public String download(String url, String outputPath) {
-        String fileName = null;
-        try {
-            // 确保输出目录存在
-            Files.createDirectories(Paths.get(outputPath));
+    // taskId -> DownloadTask
+    private static final ConcurrentHashMap<String, DownloadTask> TASK_MAP = new ConcurrentHashMap<>();
 
+    @Override
+    public String download(String url) {
+        // 文件名
+        String fileName = UUID.randomUUID() + ".mp4";
+
+        // 创建任务对象
+        String taskId = UUID.randomUUID().toString();
+        DownloadTask task = DownloadTask.of(taskId, FileTypeEnum.VIDEO, fileName);
+        TASK_MAP.put(taskId, task);
+
+        try {
             // 获取视频源信息
             FFmpegProbeResult in = ffprobe.probe(url);
-
-            // 随机文件名
-            fileName = outputPath + UUID.randomUUID() + ".mp4";
 
             // 构建FFmpeg命令参数
             FFmpegBuilder builder = new FFmpegBuilder()
@@ -68,20 +80,75 @@ public class VideoServiceImpl implements VideoService {
 
                 @Override
                 public void progress(Progress progress) {
-                    // 计算下载进度百分比
+                    // 下载进度百分比
                     int percentage = (int) Math.round(progress.out_time_ns / duration_ns * 100);
-
-                    log.info("下载进度: {}%", percentage);
+                    WebSocketServer.sendProgress(taskId, percentage);
                 }
             });
 
             // 异步执行下载任务
-            CompletableFuture.runAsync(job);
+            CompletableFuture.runAsync(() -> {
+                try {
+                    job.run();
+                    task.setCompleted(true);
+                    log.info("视频下载完成: {}", taskId);
+                } catch (Exception e) {
+                    // 删除文件
+                    FileUtil.deleteFile(fileName);
 
-            return fileName;
+                    log.error("下载视频异常：{}", e.getMessage());
+                }
+            });
+
+            return taskId;
         } catch (IOException e) {
+            // 删除文件
+            FileUtil.deleteFile(fileName);
+
             log.error("下载视频异常：{}", e.getMessage());
             throw new BusinessException("下载视频异常");
+        }
+    }
+
+
+    /**
+     * 每小时清理一次过期任务
+     */
+    @Scheduled(cron = "0 0 * * * ?")  // 每小时执行一次
+    public void cleanupExpiredTasks() {
+        log.info("开始清理过期任务");
+
+        LocalDateTime now = LocalDateTime.now();
+        int cleanCount = 0;
+
+        Iterator<Map.Entry<String, DownloadTask>> iterator = TASK_MAP.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, DownloadTask> entry = iterator.next();
+            DownloadTask task = entry.getValue();
+
+            if (task == null) continue;
+
+            // 只清理已完成的任务
+            if (!task.isCompleted()) continue;
+
+            // 任务创建超过1小时就清理
+            if (task.getCreateTime() != null) {
+                long hours = ChronoUnit.HOURS.between(task.getCreateTime(), now);
+                if (hours >= 1) {
+                    String taskId = entry.getKey();
+                    // 删除下载的文件
+                    FileUtil.deleteFile(task.getFilePath());
+
+                    // 从内存中移除任务
+                    iterator.remove();
+                    cleanCount++;
+                    log.info("清理过期任务: {}, 创建时间: {}", taskId, task.getCreateTime());
+                }
+            }
+        }
+
+        if (cleanCount > 0) {
+            log.info("清理完成，共清理 {} 个过期任务", cleanCount);
         }
     }
 }

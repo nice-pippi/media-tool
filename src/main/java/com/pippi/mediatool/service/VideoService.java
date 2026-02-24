@@ -11,10 +11,9 @@ public interface VideoService {
     /**
      * 下载视频
      *
-     * @param url        视频地址
-     * @param outputPath 输出路径
-     * @return 文件路径
+     * @param url 视频地址
+     * @return 任务ID
      */
-    String download(String url, String outputPath);
+    String download(String url);
 
 }
