@@ -2,7 +2,6 @@ package com.pippi.mediatool.mvc.controller;
 
 import com.pippi.mediatool.common.R;
 import com.pippi.mediatool.mvc.co.TaskCO;
-import com.pippi.mediatool.mvc.vo.TaskVO;
 import com.pippi.mediatool.service.impl.VideoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

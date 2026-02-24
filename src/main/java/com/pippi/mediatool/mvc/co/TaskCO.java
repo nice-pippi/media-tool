@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 /**
  * @Author: hong
  * @CreateTime: 2026-02-24
- * @Description:
+ * @Description: 任务参数-实体
  * @Version: 1.0
  */
 @Data

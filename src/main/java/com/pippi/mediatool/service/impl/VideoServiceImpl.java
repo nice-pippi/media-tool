@@ -1,11 +1,10 @@
 package com.pippi.mediatool.service.impl;
 
+import com.pippi.mediatool.common.DownloadTask;
 import com.pippi.mediatool.constant.FilePathConstant;
 import com.pippi.mediatool.enums.FileTypeEnum;
 import com.pippi.mediatool.exception.BusinessException;
-import com.pippi.mediatool.common.DownloadTask;
 import com.pippi.mediatool.mvc.co.TaskCO;
-import com.pippi.mediatool.mvc.vo.TaskVO;
 import com.pippi.mediatool.service.VideoService;
 import com.pippi.mediatool.utils.FileUtil;
 import com.pippi.mediatool.websocket.WebSocketServer;
