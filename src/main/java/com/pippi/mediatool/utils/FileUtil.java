@@ -13,6 +13,14 @@ import java.io.File;
  */
 @Slf4j
 public class FileUtil {
+    public static void makeDir(String tempPath) {
+        File file = new File(tempPath);
+        if (!file.exists()) {
+            if (file.mkdirs()) {
+                log.info("创建临时目录成功：{}", tempPath);
+            }
+        }
+    }
 
     public static void deleteFile(String filePath) {
         if (StringUtils.isEmpty(filePath)) {
@@ -28,4 +36,6 @@ public class FileUtil {
             }
         }
     }
+
+
 }

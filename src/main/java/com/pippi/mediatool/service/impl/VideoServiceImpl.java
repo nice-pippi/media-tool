@@ -1,5 +1,6 @@
 package com.pippi.mediatool.service.impl;
 
+import com.pippi.mediatool.constant.FilePathConstant;
 import com.pippi.mediatool.enums.FileTypeEnum;
 import com.pippi.mediatool.exception.BusinessException;
 import com.pippi.mediatool.pojo.DownloadTask;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -51,7 +53,8 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public String download(String url) {
         // 文件名
-        String fileName = UUID.randomUUID() + ".mp4";
+        FileUtil.makeDir(FilePathConstant.VIDEO_TEMP_PATH);
+        String fileName = FilePathConstant.VIDEO_TEMP_PATH + UUID.randomUUID() + ".mp4";
 
         // 创建任务对象
         String taskId = UUID.randomUUID().toString();
